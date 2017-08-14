@@ -1,0 +1,14 @@
+{
+  "name": "project-8-gulp",
+  "version": "1.0.0",
+  "description": "using gulp to get project ready for production",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Debbie O'Brien",
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "^3.9.1"
+  }
+}
