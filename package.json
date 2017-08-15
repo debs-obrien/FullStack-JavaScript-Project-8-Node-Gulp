@@ -15,7 +15,6 @@
     "gulp-cache": "^0.4.6",
     "gulp-clean-css": "^3.7.0",
     "gulp-concat": "^2.6.1",
-    "gulp-if": "^2.0.2",
     "gulp-imagemin": "^3.3.0",
     "gulp-rename": "^1.2.2",
     "gulp-replace": "^0.6.1",
@@ -25,7 +24,5 @@
     "gulp-useref": "^3.1.2",
     "run-sequence": "^2.1.0"
   },
-  "dependencies": {
-    "imagemin-svgo": "^5.2.2"
-  }
+  "dependencies": {}
 }
