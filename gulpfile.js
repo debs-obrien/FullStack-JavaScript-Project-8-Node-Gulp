@@ -91,7 +91,7 @@ gulp.task('watch', ['browserSync'], function (){
 
 gulp.task('build',['clean'], function(){
     gulp.start(['scripts', 'styles', 'images', 'icons']);
-    return gulp.src('index.html')
+    return gulp.src(`${paths.src}/index.html`)
         .pipe(useref())
         .pipe(replace('images/', 'content/'))
         .pipe(gulp.dest(paths.dist));
