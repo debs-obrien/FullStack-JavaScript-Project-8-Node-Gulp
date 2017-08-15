@@ -8,7 +8,9 @@ const gulp = require('gulp'),
       sass = require('gulp-sass'),
       maps = require('gulp-sourcemaps'),
        del = require ('del'),
-    useref = require('gulp-useref');
+    useref = require('gulp-useref'),
+    gulpif = require('gulp-if'),
+browserSync = require('browser-sync').create();
 
 
 gulp.task("concatJS", function(){
@@ -36,29 +38,38 @@ gulp.task('styles',['compile'],  function(){
     return gulp.src('css/global.css')
         .pipe(cleanCSS())
         .pipe(rename('all.min.css'))
-        .pipe(gulp.dest('dist/styles'));
+        .pipe(gulp.dest('dist/styles'))
+        .pipe(browserSync.reload({
+            stream: true
+        }))
 });
 
-gulp.task('watch', function(){
-    gulp.watch('sass/**/*.scss', ['styles']);
-    gulp.watch('js/global.js', ['scripts'])
 
-});
 gulp.task('clean', function(){
     del('dist');
 });
-gulp.task('html', function(){
-    gulp.src('index.html')
+gulp.task('html',['scripts', 'styles'], function(){
+    return gulp.src('index.html')
         .pipe(useref())
-        //.pipe(gulpif('*.js', scripts()))
-        //.pipe(gulpif('*.css', styles()))
         .pipe(gulp.dest('dist'));
 });
 
-gulp.task('build', ['html,', 'scripts', 'styles'], function(){
-    return gulp.src(['css/all.min.css', 'js/all.min.js', 'images/**, ' +
+gulp.task('build', ['clean', 'html'], function(){
+    return gulp.src(['css/all.min.css', 'js/all.min.js', 'images/**',
     'icons/**', 'index.html'], {base: './'})
-        .pipe(gulp.dest('dist'));
+        .pipe(gulp.dest('dist'))
+
+});
+
+gulp.task('browserSync', function() {
+    browserSync.init({
+        server: {
+            baseDir: 'dist'
+        },
+    })
+});
+gulp.task('watch', ['browserSync'], function(){
+    gulp.watch('sass/**/*.scss', ['styles']);
 });
 
 gulp.task('default', ['clean'], function(){
