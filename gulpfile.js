@@ -10,6 +10,9 @@ const gulp = require('gulp'),
        del = require ('del'),
     useref = require('gulp-useref'),
     gulpif = require('gulp-if'),
+    imagemin = require('gulp-imagemin'),
+    cache = require('gulp-cache'),
+    runSequence = require('run-sequence'),
 browserSync = require('browser-sync').create();
 
 
@@ -24,7 +27,10 @@ gulp.task('scripts', ['concatJS'], function(){
     return gulp.src('js/global.js')
         .pipe(uglify())
         .pipe(rename('all.min.js'))
-        .pipe(gulp.dest('dist/scripts'));
+        .pipe(gulp.dest('dist/scripts'))
+        .pipe(browserSync.reload({
+            stream: true
+        }))
 });
 
 gulp.task('compile', function(){
@@ -39,9 +45,7 @@ gulp.task('styles',['compile'],  function(){
         .pipe(cleanCSS())
         .pipe(rename('all.min.css'))
         .pipe(gulp.dest('dist/styles'))
-        .pipe(browserSync.reload({
-            stream: true
-        }))
+
 });
 
 
@@ -54,11 +58,11 @@ gulp.task('html',['scripts', 'styles'], function(){
         .pipe(gulp.dest('dist'));
 });
 
-gulp.task('build', ['clean', 'html'], function(){
-    return gulp.src(['css/all.min.css', 'js/all.min.js', 'images/**',
-    'icons/**', 'index.html'], {base: './'})
-        .pipe(gulp.dest('dist'))
 
+gulp.task('images', function(){
+    return gulp.src('images/**/*.+(png|jpg)')
+        .pipe(cache(imagemin()))
+        .pipe(gulp.dest('dist/images'))
 });
 
 gulp.task('browserSync', function() {
@@ -70,8 +74,24 @@ gulp.task('browserSync', function() {
 });
 gulp.task('watch', ['browserSync'], function(){
     gulp.watch('sass/**/*.scss', ['styles']);
+    gulp.watch('js/**/*.js', ['scripts']);
 });
 
-gulp.task('default', ['clean'], function(){
-    gulp.start('build');
+gulp.task('icons', function(){
+    return gulp.src('icons/**/*', { base: "." })
+        .pipe(gulp.dest('dist'))
+
+});
+gulp.task('build', function () {
+    runSequence('clean',
+        ['scripts', 'styles', 'images'],
+        ['html', 'icons']
+    )
+});
+gulp.task('default', function () {
+    runSequence('clean',
+        ['scripts', 'styles', 'images'],
+        ['html', 'icons'],
+        'watch'
+    )
 });
