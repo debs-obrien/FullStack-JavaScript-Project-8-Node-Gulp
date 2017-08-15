@@ -11,8 +11,8 @@ const gulp = require('gulp'),
     useref = require('gulp-useref'),
     gulpif = require('gulp-if'),
     imagemin = require('gulp-imagemin'),
+    imageminSvgo = require('imagemin-svgo'),
     cache = require('gulp-cache'),
-    runSequence = require('run-sequence'),
     replace = require('gulp-replace'),
 browserSync = require('browser-sync').create();
 
@@ -29,10 +29,10 @@ gulp.task("concatJS", function(){
         .pipe(gulp.dest('js'))
 });
 gulp.task('scripts', ['concatJS'], function(){
-    return gulp.src('js/global.js')
+    return gulp.src('/js/global.js')
         .pipe(uglify())
         .pipe(rename('all.min.js'))
-        .pipe(gulp.dest('dist/scripts'))
+        .pipe(gulp.dest(`${paths.dist}/scripts`))
         .pipe(browserSync.stream());
 });
 
@@ -47,18 +47,14 @@ gulp.task('styles',['compile'],  function(){
     return gulp.src('css/global.css')
         .pipe(cleanCSS())
         .pipe(rename('all.min.css'))
-        .pipe(gulp.dest('dist/styles'))
+        .pipe(gulp.dest(`${paths.dist}/styles`))
 });
-
+gulp.task('bs-reload', function () {
+    browserSync.reload();
+});
 
 gulp.task('clean', function(){
     return del('dist');
-});
-gulp.task('html',['scripts', 'styles', 'images'], function(){
-    return gulp.src('index.html')
-        .pipe(useref())
-        .pipe(replace('images/', 'content/'))
-        .pipe(gulp.dest('dist'));
 });
 
 
@@ -73,11 +69,11 @@ gulp.task('images', function(){
 });
 
 gulp.task('icons', function(){
-    return gulp.src('icons/**/*', { base: "." })
+    return gulp.src(`${paths.src}/icons/**/*`)
         .pipe(imagemin([
             imagemin.svgo({ plugins: [{ removeViewBox: true }] })
         ]))
-        .pipe(gulp.dest(`${paths.dist}`));
+        .pipe(gulp.dest(`${paths.dist}/icons`));
 
 });
 gulp.task('serve', function() {
@@ -91,10 +87,17 @@ gulp.task('serve', function() {
 gulp.task('watch', function(){
     gulp.watch('sass/**/*.scss', ['styles']);
     gulp.watch('js/**/*.js', ['scripts']);
+    gulp.watch(['*.html'], ['bs-reload']);
 });
 
-gulp.task('build',['clean', 'styles', 'scripts', 'images', 'icons', 'html']);
+gulp.task('build',['clean'], function(){
+    gulp.start(['scripts', 'styles', 'images', 'icons']);
+    return gulp.src('index.html')
+        .pipe(useref())
+        .pipe(replace('images/', 'content/'))
+        .pipe(gulp.dest('dist'));
+});
 gulp.task('default',['build'], function(){
-    gulp.start(['serve', 'watch']);
+    gulp.start(['watch', 'serve']);
 });
 
