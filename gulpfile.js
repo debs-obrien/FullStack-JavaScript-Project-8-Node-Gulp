@@ -78,15 +78,15 @@ gulp.task('icons', function(){
 gulp.task('browserSync', function() {
     return browserSync.init({
         server: {
-            baseDir: '.'
+            baseDir: paths.src
         },
     })
 });
 gulp.task('watch', ['browserSync'], function (){
     gulp.watch(`${paths.src}/sass/**/*.scss`, ['styles']);
     gulp.watch(`${paths.src}/js/**/*.js`, ['scripts']);
-    gulp.watch(['*.css'], ['bs-reload']);
-    gulp.watch(['*.html'], ['bs-reload']);
+    gulp.watch([`${paths.src}/*.css`], ['bs-reload']);
+    gulp.watch([`${paths.src}/*.html`], ['bs-reload']);
 });
 
 gulp.task('build',['clean'], function(){
